@@ -1,0 +1,2267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VELOCE — Quick Commerce Operating System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --ink: #0a0a0a;
+  --ink2: #1a1a1a;
+  --ink3: #2a2a2a;
+  --muted: #6b6b6b;
+  --faint: #d4d4d4;
+  --ghost: #f0efeb;
+  --surface: #fafaf8;
+  --white: #ffffff;
+  --accent: #e8380d;
+  --accent2: #ff6b00;
+  --green: #1a7a4a;
+  --greenl: #e8f7ef;
+  --amber: #b85c00;
+  --amberl: #fff4e6;
+  --blue: #1a4f8a;
+  --bluel: #e8f0ff;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+  --font-serif: 'Libre Baskerville', serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-mono);
+  background: var(--ink);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* GRAIN OVERLAY */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.6;
+}
+
+/* NAV */
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 2.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  position: sticky;
+  top: 0;
+  background: rgba(10,10,10,0.96);
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+
+.nav-brand {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.4rem;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(0.8); }
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 0;
+  background: rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: 3px;
+}
+
+.nav-tab {
+  padding: 6px 16px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 6px;
+  color: rgba(255,255,255,0.5);
+  transition: all 0.2s;
+  border: none;
+  background: none;
+}
+
+.nav-tab.active {
+  background: var(--accent);
+  color: white;
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.4);
+  font-family: var(--font-mono);
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #4caf93;
+  font-size: 0.68rem;
+}
+
+.live-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4caf93;
+  animation: pulse 1.5s infinite;
+}
+
+/* SECTIONS */
+.section {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+.section.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* HERO WAR ROOM */
+.war-room-hero {
+  padding: 3rem 2.5rem 2rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.hero-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+  font-family: var(--font-mono);
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--white);
+}
+
+.hero-title span { color: var(--accent); }
+
+.hero-sub {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.4);
+  margin-top: 1rem;
+  max-width: 600px;
+  line-height: 1.7;
+}
+
+/* KPI RAIL */
+.kpi-rail {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.kpi-cell {
+  padding: 1.5rem 2rem;
+  border-right: 1px solid rgba(255,255,255,0.06);
+}
+.kpi-cell:last-child { border-right: none; }
+
+.kpi-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 0.5rem;
+}
+
+.kpi-value {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.kpi-change {
+  font-size: 0.68rem;
+  margin-top: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.kpi-change.up { color: #4caf93; }
+.kpi-change.down { color: #e85d5d; }
+.kpi-change.neutral { color: rgba(255,255,255,0.4); }
+
+/* GRID LAYOUTS */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+.grid-4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+.grid-65 {
+  display: grid;
+  grid-template-columns: 6fr 5fr;
+  gap: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+.panel {
+  background: var(--ink);
+  padding: 1.8rem 2rem;
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+/* ORDER FLOW DIAGRAM */
+.flow-container {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  overflow-x: auto;
+  padding: 1rem 0;
+}
+
+.flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 90px;
+}
+
+.flow-node {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  border: 2px solid rgba(255,255,255,0.15);
+  position: relative;
+}
+
+.flow-node.active-node { background: var(--accent); border-color: var(--accent); }
+.flow-node.done-node { background: #1a7a4a; border-color: #1a7a4a; }
+.flow-node.pending-node { background: rgba(255,255,255,0.05); }
+
+.flow-label {
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.4);
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.flow-arrow {
+  width: 30px; height: 1px;
+  background: rgba(255,255,255,0.15);
+  flex-shrink: 0;
+  position: relative;
+  top: -12px;
+}
+
+.flow-arrow::after {
+  content: '›';
+  position: absolute;
+  right: -5px;
+  top: -8px;
+  color: rgba(255,255,255,0.3);
+  font-size: 0.8rem;
+}
+
+/* CHARTS */
+.chart-wrap {
+  position: relative;
+  width: 100%;
+}
+
+/* TABLES */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.75rem;
+}
+
+.data-table th {
+  text-align: left;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.3);
+  padding: 0 0 0.7rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  font-weight: 400;
+}
+
+.data-table td {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: rgba(255,255,255,0.8);
+  vertical-align: middle;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+
+.status-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+.status-pill.live { background: rgba(76,175,147,0.15); color: #4caf93; }
+.status-pill.building { background: rgba(232,56,13,0.15); color: #ff7755; }
+.status-pill.planned { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); }
+.status-pill.critical { background: rgba(232,93,93,0.15); color: #e85d5d; }
+
+/* METRIC BARS */
+.metric-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.metric-bar-label {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.5);
+  min-width: 100px;
+}
+
+.metric-bar-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.metric-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: var(--accent);
+  transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
+.metric-bar-fill.green { background: #4caf93; }
+.metric-bar-fill.amber { background: #f0a500; }
+.metric-bar-fill.blue { background: #5590e0; }
+
+.metric-bar-val {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  min-width: 35px;
+  text-align: right;
+  color: rgba(255,255,255,0.6);
+}
+
+/* PHASE TIMELINE */
+.phase-track {
+  position: relative;
+  padding-left: 2rem;
+}
+
+.phase-track::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 8px;
+  bottom: 8px;
+  width: 1px;
+  background: rgba(255,255,255,0.1);
+}
+
+.phase-item {
+  position: relative;
+  padding: 0 0 1.5rem 1.5rem;
+}
+
+.phase-item::before {
+  content: '';
+  position: absolute;
+  left: -1.5rem;
+  top: 6px;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.15);
+}
+
+.phase-item.done::before { background: #4caf93; border-color: #4caf93; }
+.phase-item.current::before { background: var(--accent); border-color: var(--accent); animation: pulse 2s infinite; }
+
+.phase-title {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+
+.phase-meta {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.6;
+}
+
+/* ARCH BOXES */
+.arch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.arch-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.arch-box-title {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  margin-bottom: 0.6rem;
+}
+
+.arch-box-items {
+  list-style: none;
+}
+
+.arch-box-items li {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.55);
+  padding: 3px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.arch-box-items li::before {
+  content: '·';
+  color: var(--accent);
+  font-size: 1rem;
+}
+
+/* STACK LAYERS */
+.stack-layer {
+  display: flex;
+  align-items: stretch;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.stack-layer-label {
+  min-width: 120px;
+  background: rgba(255,255,255,0.04);
+  padding: 10px 14px;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.35);
+  display: flex;
+  align-items: center;
+}
+
+.stack-layer-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+}
+
+.tech-tag {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 0.62rem;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.7);
+  font-family: var(--font-mono);
+}
+
+/* PRD FEATURE CARDS */
+.feature-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px;
+  padding: 1.2rem;
+  margin-bottom: 10px;
+}
+
+.feature-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
+}
+
+.feature-name {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.feature-priority {
+  font-size: 0.58rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.priority-p0 { background: rgba(232,56,13,0.2); color: #ff7755; }
+.priority-p1 { background: rgba(240,165,0,0.2); color: #f0a500; }
+.priority-p2 { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); }
+
+.feature-row {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 6px 12px;
+  font-size: 0.68rem;
+}
+
+.feature-row-label {
+  color: rgba(255,255,255,0.3);
+  padding: 3px 0;
+}
+
+.feature-row-val {
+  color: rgba(255,255,255,0.65);
+  padding: 3px 0;
+  line-height: 1.5;
+}
+
+/* INVESTOR TABLE */
+.investor-card {
+  display: grid;
+  grid-template-columns: 1fr 1fr 80px 80px;
+  gap: 10px;
+  align-items: center;
+  padding: 0.9rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.72rem;
+}
+.investor-card:last-child { border-bottom: none; }
+
+.vc-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+.vc-focus {
+  font-size: 0.63rem;
+  color: rgba(255,255,255,0.35);
+  margin-top: 2px;
+}
+
+.check-size {
+  font-family: var(--font-mono);
+  color: #4caf93;
+}
+
+.interest-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.interest-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* SOP CARD */
+.sop-item {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.sop-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.sop-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: rgba(232,56,13,0.15);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.sop-content {}
+.sop-step-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-display);
+  margin-bottom: 0.25rem;
+}
+.sop-step-meta {
+  font-size: 0.63rem;
+  color: rgba(255,255,255,0.35);
+  line-height: 1.6;
+}
+
+/* UNIT ECONOMICS */
+.unit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+.unit-cell {
+  background: var(--ink);
+  padding: 1.2rem 1.5rem;
+}
+
+.unit-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 0.4rem;
+}
+
+.unit-value {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+.unit-value.positive { color: #4caf93; }
+.unit-value.negative { color: #e85d5d; }
+.unit-value.neutral {}
+
+.unit-note {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.25);
+  margin-top: 0.2rem;
+}
+
+/* ROADMAP */
+.roadmap-row {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+  align-items: start;
+}
+
+.roadmap-period {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  padding-top: 3px;
+  font-family: var(--font-mono);
+}
+
+.roadmap-milestones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.milestone-tag {
+  font-size: 0.65rem;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.65);
+}
+
+.milestone-tag.key {
+  background: rgba(232,56,13,0.12);
+  border-color: rgba(232,56,13,0.3);
+  color: #ff8866;
+}
+
+/* AI FEATURE */
+.ai-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), #ff6b00, transparent);
+}
+
+.ai-card-title {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+
+.ai-card-desc {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.6;
+  margin-bottom: 0.8rem;
+}
+
+.ai-impact {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.ai-impact-item {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ai-impact-item span {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: #4caf93;
+  font-weight: 700;
+}
+
+/* SECTION WRAPPER */
+.section-body {
+  padding: 0;
+}
+
+/* BIG NUMBER */
+.big-num {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+/* CHART OVERRIDES */
+canvas { max-width: 100%; }
+
+/* RESPONSIVE */
+@media (max-width: 1200px) {
+  .kpi-rail { grid-template-columns: repeat(3, 1fr); }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+}
+
+.section-scroll {
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+
+.separator {
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+  margin: 0;
+}
+
+.accent-text { color: var(--accent); }
+.green-text { color: #4caf93; }
+.muted-text { color: rgba(255,255,255,0.35); }
+.mono { font-family: var(--font-mono); }
+
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.45);
+  margin-right: 4px;
+}
+
+.escalation-matrix {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.esc-cell {
+  background: rgba(255,255,255,0.03);
+  border-radius: 6px;
+  padding: 0.9rem;
+  border-left: 3px solid;
+}
+.esc-cell.l1 { border-color: #4caf93; }
+.esc-cell.l2 { border-color: #f0a500; }
+.esc-cell.l3 { border-color: #e85d5d; }
+
+.esc-level {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+.l1 .esc-level { color: #4caf93; }
+.l2 .esc-level { color: #f0a500; }
+.l3 .esc-level { color: #e85d5d; }
+
+.esc-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: var(--font-display);
+  margin-bottom: 0.3rem;
+}
+.esc-meta { font-size: 0.62rem; color: rgba(255,255,255,0.35); line-height: 1.5; }
+
+.growth-loop {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.loop-step {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px;
+  padding: 8px 14px;
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+}
+
+.loop-arrow {
+  color: var(--accent);
+  font-size: 1.2rem;
+  padding: 0 6px;
+}
+
+.cap-table-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 80px 80px;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.72rem;
+  align-items: center;
+}
+.cap-table-row.header {
+  font-size: 0.6rem;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.equity-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+.equity-fill {
+  height: 100%;
+  border-radius: 3px;
+}
+
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-brand">
+    <div class="brand-dot"></div>
+    VELOCE OS
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('warroom')">War Room</button>
+    <button class="nav-tab" onclick="showSection('architecture')">Architecture</button>
+    <button class="nav-tab" onclick="showSection('prd')">PRD</button>
+    <button class="nav-tab" onclick="showSection('techstack')">Tech Stack</button>
+    <button class="nav-tab" onclick="showSection('investors')">Investors</button>
+    <button class="nav-tab" onclick="showSection('ops')">Ops Playbook</button>
+    <button class="nav-tab" onclick="showSection('growth')">Growth</button>
+    <button class="nav-tab" onclick="showSection('ai')">AI Roadmap</button>
+    <button class="nav-tab" onclick="showSection('timeline')">Timeline</button>
+  </div>
+  <div class="nav-right">
+    <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+    <span>Delhi NCR · D+47</span>
+  </div>
+</nav>
+
+<!-- ================================ WAR ROOM ================================ -->
+<div class="section active" id="warroom">
+  <div class="war-room-hero">
+    <div class="hero-label">Founder War Room · Quick Commerce Operating System</div>
+    <div class="hero-title">BUILD A<br><span>$100B</span><br>COMPANY</div>
+    <div class="hero-sub">Hyperlocal quick-commerce marketplace → Logistics Layer → Merchant OS → Data Network → Consumer Ecosystem → Infrastructure Company. Zepto-scale ambition. DoorDash operationally. Stripe architecturally.</div>
+  </div>
+
+  <div class="kpi-rail">
+    <div class="kpi-cell">
+      <div class="kpi-label">Daily GMV</div>
+      <div class="kpi-value accent-text">₹2.4L</div>
+      <div class="kpi-change up">↑ 34% WoW</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">Orders Today</div>
+      <div class="kpi-value">847</div>
+      <div class="kpi-change up">↑ 28% WoW</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">Avg Delivery</div>
+      <div class="kpi-value">22<span style="font-size:1rem"> min</span></div>
+      <div class="kpi-change up">↓ 4 min MoM</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">Active Merchants</div>
+      <div class="kpi-value">63</div>
+      <div class="kpi-change neutral">+8 this week</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">Burn Rate</div>
+      <div class="kpi-value">₹8.2L<span style="font-size:0.9rem">/mo</span></div>
+      <div class="kpi-change down">Runway: 8mo</div>
+    </div>
+    <div class="kpi-cell">
+      <div class="kpi-label">NPS Score</div>
+      <div class="kpi-value">71</div>
+      <div class="kpi-change up">↑ 12 pts MoM</div>
+    </div>
+  </div>
+
+  <!-- ORDER LIFECYCLE -->
+  <div class="panel" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+    <div class="panel-title">Order Lifecycle — Real-Time Flow</div>
+    <div class="flow-container">
+      <div class="flow-step">
+        <div class="flow-node done-node">1</div>
+        <div class="flow-label">Customer<br>Places Order</div>
+      </div>
+      <div class="flow-arrow"></div>
+      <div class="flow-step">
+        <div class="flow-node done-node">2</div>
+        <div class="flow-label">Payment<br>Captured</div>
+      </div>
+      <div class="flow-arrow"></div>
+      <div class="flow-step">
+        <div class="flow-node done-node">3</div>
+        <div class="flow-label">Merchant<br>Notified</div>
+      </div>
+      <div class="flow-arrow"></div>
+      <div class="flow-step">
+        <div class="flow-node active-node">4</div>
+        <div class="flow-label">Rider<br>Assigned</div>
+      </div>
+      <div class="flow-arrow"></div>
+      <div class="flow-step">
+        <div class="flow-node pending-node">5</div>
+        <div class="flow-label">Pickup<br>Confirmed</div>
+      </div>
+      <div class="flow-arrow"></div>
+      <div class="flow-step">
+        <div class="flow-node pending-node">6</div>
+        <div class="flow-label">En Route<br>+ Tracking</div>
+      </div>
+      <div class="flow-arrow"></div>
+      <div class="flow-step">
+        <div class="flow-node pending-node">7</div>
+        <div class="flow-label">Delivered<br>+ POD</div>
+      </div>
+      <div class="flow-arrow"></div>
+      <div class="flow-step">
+        <div class="flow-node pending-node">8</div>
+        <div class="flow-label">Merchant<br>Settled</div>
+      </div>
+    </div>
+    <div style="margin-top: 1rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+      <div style="font-size: 0.65rem; color: rgba(255,255,255,0.3);">
+        <div style="color: rgba(255,255,255,0.6); font-weight: 600; margin-bottom: 3px;">Backend Event</div>
+        order.created → payment.verified → inventory.reserved → rider.search.start
+      </div>
+      <div style="font-size: 0.65rem; color: rgba(255,255,255,0.3);">
+        <div style="color: rgba(255,255,255,0.6); font-weight: 600; margin-bottom: 3px;">Timeout SLAs</div>
+        Merchant Accept: 90s · Rider Assign: 3min · Pickup: 8min · Delivery: 20min
+      </div>
+      <div style="font-size: 0.65rem; color: rgba(255,255,255,0.3);">
+        <div style="color: rgba(255,255,255,0.6); font-weight: 600; margin-bottom: 3px;">Failure Modes</div>
+        Merchant reject → auto-reassign · Rider cancel → penalty + requeue · OTP fail → escalate
+      </div>
+      <div style="font-size: 0.65rem; color: rgba(255,255,255,0.3);">
+        <div style="color: rgba(255,255,255,0.6); font-weight: 600; margin-bottom: 3px;">Refund Logic</div>
+        Pre-pickup: instant · En-route: partial · Post-delivery: manual review (24hr SLA)
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-65">
+    <!-- GMV CHART -->
+    <div class="panel">
+      <div class="panel-title">GMV Growth Trajectory (₹ Lakhs)</div>
+      <div class="chart-wrap" style="height: 220px;">
+        <canvas id="gmvChart" role="img" aria-label="GMV growth chart showing weekly revenue trajectory">Weekly GMV growth data</canvas>
+      </div>
+    </div>
+
+    <!-- TOP MERCHANTS -->
+    <div class="panel">
+      <div class="panel-title">Top Performing Merchants</div>
+      <table class="data-table">
+        <thead><tr>
+          <th>Merchant</th><th>Category</th><th>Orders/Day</th><th>Rating</th>
+        </tr></thead>
+        <tbody>
+          <tr><td><strong>Sharma Kirana</strong></td><td><span class="tag">Grocery</span></td><td>47</td><td><span class="green-text">4.8★</span></td></tr>
+          <tr><td><strong>Gupta Medicals</strong></td><td><span class="tag">Pharma</span></td><td>31</td><td><span class="green-text">4.9★</span></td></tr>
+          <tr><td><strong>Punjab Dhaba</strong></td><td><span class="tag">Food</span></td><td>29</td><td><span class="green-text">4.7★</span></td></tr>
+          <tr><td><strong>Fresh Bake Co</strong></td><td><span class="tag">Bakery</span></td><td>22</td><td>4.5★</td></tr>
+          <tr><td><strong>Naturals Ice Cream</strong></td><td><span class="tag">Desserts</span></td><td>18</td><td>4.6★</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <!-- UNIT ECONOMICS -->
+    <div class="panel">
+      <div class="panel-title">Unit Economics (per order)</div>
+      <div class="unit-grid">
+        <div class="unit-cell">
+          <div class="unit-label">AOV</div>
+          <div class="unit-value">₹285</div>
+        </div>
+        <div class="unit-cell">
+          <div class="unit-label">Platform Take Rate</div>
+          <div class="unit-value">18%</div>
+        </div>
+        <div class="unit-cell">
+          <div class="unit-label">Delivery Fee (avg)</div>
+          <div class="unit-value positive">₹28</div>
+        </div>
+        <div class="unit-cell">
+          <div class="unit-label">Rider Cost</div>
+          <div class="unit-value negative">-₹45</div>
+        </div>
+        <div class="unit-cell">
+          <div class="unit-label">Contribution</div>
+          <div class="unit-value positive">₹34</div>
+        </div>
+        <div class="unit-cell">
+          <div class="unit-label">CAC (blended)</div>
+          <div class="unit-value">₹180</div>
+        </div>
+      </div>
+      <div style="margin-top: 1rem; padding: 0.8rem; background: rgba(76,175,147,0.08); border-radius: 6px; border: 1px solid rgba(76,175,147,0.15);">
+        <div style="font-size: 0.62rem; color: #4caf93; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px;">Contribution Positive at</div>
+        <div style="font-family: var(--font-display); font-size: 1rem; font-weight: 700;">8 orders/month/customer</div>
+      </div>
+    </div>
+
+    <!-- OPERATIONAL HEALTH -->
+    <div class="panel">
+      <div class="panel-title">Operational Health</div>
+      <div class="metric-bar-row"><div class="metric-bar-label">On-Time Delivery</div><div class="metric-bar-track"><div class="metric-bar-fill green" style="width: 87%"></div></div><div class="metric-bar-val">87%</div></div>
+      <div class="metric-bar-row"><div class="metric-bar-label">Order Acceptance</div><div class="metric-bar-track"><div class="metric-bar-fill green" style="width: 94%"></div></div><div class="metric-bar-val">94%</div></div>
+      <div class="metric-bar-row"><div class="metric-bar-label">Rider Utilization</div><div class="metric-bar-track"><div class="metric-bar-fill amber" style="width: 71%"></div></div><div class="metric-bar-val">71%</div></div>
+      <div class="metric-bar-row"><div class="metric-bar-label">Merchant Rating 4+</div><div class="metric-bar-track"><div class="metric-bar-fill green" style="width: 89%"></div></div><div class="metric-bar-val">89%</div></div>
+      <div class="metric-bar-row"><div class="metric-bar-label">Refund Rate</div><div class="metric-bar-track"><div class="metric-bar-fill" style="width: 3.2%"></div></div><div class="metric-bar-val">3.2%</div></div>
+      <div class="metric-bar-row"><div class="metric-bar-label">Fake Order Rate</div><div class="metric-bar-track"><div class="metric-bar-fill green" style="width: 0.8%"></div></div><div class="metric-bar-val">0.8%</div></div>
+      <div class="metric-bar-row"><div class="metric-bar-label">App Crash Rate</div><div class="metric-bar-track"><div class="metric-bar-fill green" style="width: 0.4%"></div></div><div class="metric-bar-val">0.4%</div></div>
+    </div>
+
+    <!-- CRITICAL ALERTS -->
+    <div class="panel">
+      <div class="panel-title">Founder Alerts — Action Required</div>
+      <table class="data-table">
+        <thead><tr><th>Issue</th><th>Severity</th><th>Owner</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Lajpat Nagar rider coverage gap (5–7pm)</td>
+            <td><span class="status-pill critical">Critical</span></td>
+            <td class="muted-text">Ops Lead</td>
+          </tr>
+          <tr>
+            <td>Merchant inventory sync failure: 3 stores</td>
+            <td><span class="status-pill building">High</span></td>
+            <td class="muted-text">Engineering</td>
+          </tr>
+          <tr>
+            <td>Pre-seed deck: Accel meeting Thu</td>
+            <td><span class="status-pill building">High</span></td>
+            <td class="muted-text">Founder</td>
+          </tr>
+          <tr>
+            <td>Delivery SLA breach 2 orders yesterday</td>
+            <td><span class="status-pill live">Resolved</span></td>
+            <td class="muted-text">Ops</td>
+          </tr>
+          <tr>
+            <td>Pricing model update (pharma category)</td>
+            <td><span class="status-pill planned">Planned</span></td>
+            <td class="muted-text">Product</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ================================ ARCHITECTURE ================================ -->
+<div class="section" id="architecture">
+  <div class="war-room-hero">
+    <div class="hero-label">System Architecture · Multi-Layer Design</div>
+    <div class="hero-title">HOW THE<br><span>MACHINE</span><br>WORKS</div>
+  </div>
+
+  <!-- Architecture Overview -->
+  <div class="panel" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+    <div class="panel-title">Master Architecture — 6-Layer System</div>
+    <div class="arch-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 1.5rem;">
+      <div class="arch-box">
+        <div class="arch-box-title">Layer 1 — Consumer Layer</div>
+        <ul class="arch-box-items">
+          <li>Customer App (iOS + Android + Web)</li>
+          <li>Personalization Engine</li>
+          <li>Search & Discovery</li>
+          <li>Cart & Checkout System</li>
+          <li>Live Tracking Interface</li>
+          <li>Wallet + Rewards</li>
+        </ul>
+      </div>
+      <div class="arch-box">
+        <div class="arch-box-title">Layer 2 — Marketplace Layer</div>
+        <ul class="arch-box-items">
+          <li>Merchant Catalog System</li>
+          <li>Inventory Sync Engine (real-time)</li>
+          <li>Pricing & Promotions Engine</li>
+          <li>Order Routing Logic</li>
+          <li>Commission Calculation</li>
+          <li>Merchant Rating System</li>
+        </ul>
+      </div>
+      <div class="arch-box">
+        <div class="arch-box-title">Layer 3 — Logistics Layer</div>
+        <ul class="arch-box-items">
+          <li>Rider Assignment Algorithm</li>
+          <li>Route Optimization (OSRM)</li>
+          <li>Geofencing System</li>
+          <li>ETA Prediction Model</li>
+          <li>Fleet Management</li>
+          <li>Proof of Delivery System</li>
+        </ul>
+      </div>
+      <div class="arch-box">
+        <div class="arch-box-title">Layer 4 — Intelligence Layer</div>
+        <ul class="arch-box-items">
+          <li>Demand Forecasting (LSTM)</li>
+          <li>Fraud Detection (ML)</li>
+          <li>Dynamic Pricing Engine</li>
+          <li>Recommendation System</li>
+          <li>Surge Prediction</li>
+          <li>Merchant Intelligence</li>
+        </ul>
+      </div>
+      <div class="arch-box">
+        <div class="arch-box-title">Layer 5 — Data Layer</div>
+        <ul class="arch-box-items">
+          <li>Event Streaming (Kafka)</li>
+          <li>Data Warehouse (Snowflake)</li>
+          <li>Real-time Analytics (Druid)</li>
+          <li>User Behavioral Graph</li>
+          <li>Location Intelligence DB</li>
+          <li>Vector DB for AI</li>
+        </ul>
+      </div>
+      <div class="arch-box">
+        <div class="arch-box-title">Layer 6 — Infrastructure</div>
+        <ul class="arch-box-items">
+          <li>AWS Multi-AZ Deployment</li>
+          <li>Kubernetes Orchestration</li>
+          <li>API Gateway + CDN</li>
+          <li>WebSocket Server (real-time)</li>
+          <li>Redis Cache Cluster</li>
+          <li>Observability Stack</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <!-- MERCHANT LIFECYCLE -->
+    <div class="panel">
+      <div class="panel-title">Merchant Lifecycle</div>
+      <div class="phase-track">
+        <div class="phase-item done">
+          <div class="phase-title">Lead & Discovery</div>
+          <div class="phase-meta">City ops team identifies merchants → cold visit → demo pitch · Qualification: 50+ orders/day potential, good rating, willing to integrate</div>
+        </div>
+        <div class="phase-item done">
+          <div class="phase-title">Onboarding (D0–D3)</div>
+          <div class="phase-meta">Sign MOU → FSSAI/license verification → catalog upload → POS/inventory API integration or manual menu entry → test order run</div>
+        </div>
+        <div class="phase-item current">
+          <div class="phase-title">Go-Live & Ramp (D4–D30)</div>
+          <div class="phase-meta">First 50 orders handholding · Dedicated account manager · Weekly performance reviews · Incentive programs · Rating optimization coaching</div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-title">Steady State</div>
+          <div class="phase-meta">Automated reporting · Demand forecasting reports · Promotional tools access · Premium placement in app · Co-marketing opportunities</div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-title">Power Merchant</div>
+          <div class="phase-meta">VELOCE Merchant of the Month · API-first integration · Custom analytics dashboard · Preferential commission structure · Co-branded products</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIDER LIFECYCLE -->
+    <div class="panel">
+      <div class="panel-title">Rider Lifecycle + Fraud Detection</div>
+      <div class="phase-track">
+        <div class="phase-item done">
+          <div class="phase-title">Recruitment</div>
+          <div class="phase-meta">Partner with local bike mechanic shops · College area flyers · WhatsApp groups · Referral bonus ₹500 per successful rider</div>
+        </div>
+        <div class="phase-item done">
+          <div class="phase-title">Verification (D0)</div>
+          <div class="phase-meta">Aadhaar + DL verification via DigiLocker · Vehicle RC check · Criminal record (self-declaration + police cert) · App install + training video (30min)</div>
+        </div>
+        <div class="phase-item current">
+          <div class="phase-title">Onboarding (D1–D7)</div>
+          <div class="phase-meta">Buddy ride first 3 days · Geo-training on zones · Incentive structure explained · Base: ₹25/order + distance + surge</div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-title">Performance Monitoring</div>
+          <div class="phase-meta">Daily: orders, time, rating, cancellations · Fraud signals: GPS spoofing, OTP fraud, fake POD, short-circuit routes, order stuffing</div>
+        </div>
+        <div class="phase-item">
+          <div class="phase-title">Tier System</div>
+          <div class="phase-meta">Bronze → Silver → Gold → Elite · Earnings multiplier 1x→1.35x · Priority order assignment · Better shift slots · Accident insurance</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BACKEND EVENT FLOW -->
+  <div class="panel" style="border-top: 1px solid rgba(255,255,255,0.06);">
+    <div class="panel-title">Backend Event Flow — Order State Machine</div>
+    <div style="font-family: var(--font-mono); font-size: 0.68rem; color: rgba(255,255,255,0.55); line-height: 2; background: rgba(255,255,255,0.02); border-radius: 8px; padding: 1.2rem; border: 1px solid rgba(255,255,255,0.06);">
+      <span style="color: #4caf93;">[EVENT]</span> order.placed → <span style="color: var(--accent);">{order_id, user_id, merchant_id, items[], payment_method}</span><br>
+      <span style="color: #4caf93;">[TRIGGER]</span> Payment Gateway (Razorpay) → payment.captured event → Kafka topic: payments<br>
+      <span style="color: #4caf93;">[TRIGGER]</span> Inventory Service: reserve_stock(item_ids, quantities) → inventory.reserved<br>
+      <span style="color: #4caf93;">[PUSH]</span> Merchant Notification Service → FCM push + SMS → merchant.notified<br>
+      <span style="color: #f0a500;">[TIMEOUT]</span> If merchant.accept not received in 90s → auto_accept OR reassign to next eligible merchant<br>
+      <span style="color: #4caf93;">[TRIGGER]</span> Rider Assignment Service → geo-query within 3km radius → score(proximity, rating, load) → rider.assigned<br>
+      <span style="color: #4caf93;">[STREAM]</span> Location Service: WebSocket session open → rider GPS → ETA recalculation every 15s<br>
+      <span style="color: #4caf93;">[EVENT]</span> order.picked_up → POD photo captured → delivery.in_progress<br>
+      <span style="color: #4caf93;">[EVENT]</span> order.delivered → OTP verified → settlement.initiated → merchant credited T+2<br>
+      <span style="color: #f0a500;">[FAILURE]</span> Any step timeout → escalation.triggered → ops_team.alert → customer_notified
+    </div>
+  </div>
+</div>
+
+<!-- ================================ PRD ================================ -->
+<div class="section" id="prd">
+  <div class="war-room-hero">
+    <div class="hero-label">Product Requirements Document · v1.4</div>
+    <div class="hero-title">WHAT WE'RE<br><span>BUILDING</span></div>
+  </div>
+
+  <div class="grid-2">
+    <!-- CUSTOMER APP -->
+    <div class="panel" style="border-right: 1px solid rgba(255,255,255,0.06);">
+      <div class="panel-title">A. Customer App — Core Features</div>
+
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div class="feature-name">AI-Powered Home Feed</div>
+          <div class="feature-priority priority-p0">P0</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-label">Problem</div>
+          <div class="feature-row-val">Users don't know what nearby merchants have in stock right now</div>
+          <div class="feature-row-label">Backend</div>
+          <div class="feature-row-val">Personalization API → user_preference_model + time_of_day + location + inventory_availability → ranked feed</div>
+          <div class="feature-row-label">Key Tables</div>
+          <div class="feature-row-val mono" style="font-size: 0.6rem;">user_preferences, merchant_catalog, inventory_snapshot, user_order_history</div>
+          <div class="feature-row-label">KPIs</div>
+          <div class="feature-row-val">CTR on feed items · Add-to-cart rate · Session time</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div class="feature-name">Live Order Tracking</div>
+          <div class="feature-priority priority-p0">P0</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-label">Problem</div>
+          <div class="feature-row-val">Anxiety gap between order placed and delivery — the #1 support contact driver</div>
+          <div class="feature-row-label">Backend</div>
+          <div class="feature-row-val">WebSocket connection → rider GPS stream → Mapbox rendering → ETA model (XGBoost) → push updates every 15s</div>
+          <div class="feature-row-label">Edge Cases</div>
+          <div class="feature-row-val">GPS lost → last known position + estimated position · Rider offline >3min → auto-escalate to ops</div>
+          <div class="feature-row-label">KPIs</div>
+          <div class="feature-row-val">Support contact rate · CSAT · "Where is my order" ticket volume</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div class="feature-name">VELOCE Pass (Subscription)</div>
+          <div class="feature-priority priority-p1">P1</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-label">Problem</div>
+          <div class="feature-row-val">High-frequency users paying delivery fees erodes loyalty; need a moat</div>
+          <div class="feature-row-label">Model</div>
+          <div class="feature-row-val">₹99/mo → free delivery (up to ₹30 fee per order) + 5% cashback + priority support. Target: 8+ orders/month users</div>
+          <div class="feature-row-label">Monetization</div>
+          <div class="feature-row-val">₹99/mo × 10K subs = ₹9.9L MRR. Reduces CAC from subscribers. Reduces churn 60%</div>
+          <div class="feature-row-label">KPIs</div>
+          <div class="feature-row-val">Subscriber count · Orders/subscriber · LTV vs non-subscriber</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div class="feature-name">Voice Ordering (Phase 2)</div>
+          <div class="feature-priority priority-p2">P2</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-label">Problem</div>
+          <div class="feature-row-val">India's next 200M users prefer voice; text-first UX is a barrier</div>
+          <div class="feature-row-label">Backend</div>
+          <div class="feature-row-val">Hindi/English STT (Sarvam AI API) → NLU intent extraction → catalog matching → cart build → confirmation</div>
+          <div class="feature-row-label">KPIs</div>
+          <div class="feature-row-val">Voice order completion rate · New user activation from voice cohort</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MERCHANT + RIDER DASHBOARD -->
+    <div class="panel">
+      <div class="panel-title">B. Merchant Dashboard — Core Features</div>
+
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div class="feature-name">Real-Time Order Queue</div>
+          <div class="feature-priority priority-p0">P0</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-label">Problem</div>
+          <div class="feature-row-val">Merchants miss or delay orders — kills NPS and rider utilization</div>
+          <div class="feature-row-label">Backend</div>
+          <div class="feature-row-val">WebSocket push → order queue with audio alert → accept/reject with reason → SLA countdown timer visible</div>
+          <div class="feature-row-label">Edge Cases</div>
+          <div class="feature-row-val">No internet: SMS fallback to merchant's WhatsApp number · 3 consecutive rejects → account flag</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div class="feature-name">Inventory Sync Engine</div>
+          <div class="feature-priority priority-p0">P0</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-label">Problem</div>
+          <div class="feature-row-val">60% of order failures are due to out-of-stock items not updated on platform</div>
+          <div class="feature-row-label">Solutions</div>
+          <div class="feature-row-val">Option A: API integration with POS (Petpooja, UrbanPiper) · Option B: Manual toggle in app · Option C: QR scan to mark OOS</div>
+          <div class="feature-row-label">KPIs</div>
+          <div class="feature-row-val">OOS cancellation rate · Inventory accuracy score (target: 96%)</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div class="feature-name">AI Demand Forecasting</div>
+          <div class="feature-priority priority-p1">P1</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-label">Problem</div>
+          <div class="feature-row-val">Merchants waste food/stock or run out during peak hours</div>
+          <div class="feature-row-label">Backend</div>
+          <div class="feature-row-val">LSTM model trained on order history + weather + events + time → "Expect 2x demand tomorrow 6–9pm" alert + suggested prep quantities</div>
+          <div class="feature-row-label">KPIs</div>
+          <div class="feature-row-val">Forecast accuracy (MAPE) · Merchant prep time · OOS events/week</div>
+        </div>
+      </div>
+
+      <div class="panel-title" style="margin-top: 1.5rem;">C. Rider App — Core Features</div>
+
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div class="feature-name">Earnings Dashboard</div>
+          <div class="feature-priority priority-p0">P0</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-label">Why</div>
+          <div class="feature-row-val">Rider retention = supply reliability. Earnings transparency = trust = retention</div>
+          <div class="feature-row-label">Features</div>
+          <div class="feature-row-val">Today / Week / Month earnings · Incentive progress bar · Tips · Instant withdrawal (UPI) · Tax statement</div>
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-card-header">
+          <div class="feature-name">Surge Heatmaps</div>
+          <div class="feature-priority priority-p1">P1</div>
+        </div>
+        <div class="feature-row">
+          <div class="feature-row-label">Why</div>
+          <div class="feature-row-val">Riders idle in low-demand zones → platform imbalance → late deliveries</div>
+          <div class="feature-row-label">Backend</div>
+          <div class="feature-row-val">Real-time order density map + prediction layer → show rider where next 30min demand will be → nudge bonus for positioning</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================ TECH STACK ================================ -->
+<div class="section" id="techstack">
+  <div class="war-room-hero">
+    <div class="hero-label">Engineering System · Unicorn-Grade Architecture</div>
+    <div class="hero-title">BUILT TO<br><span>SCALE</span></div>
+  </div>
+
+  <div class="panel" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+    <div class="panel-title">Complete Technology Stack</div>
+    <div class="stack-layer">
+      <div class="stack-layer-label">Mobile</div>
+      <div class="stack-layer-content">
+        <span class="tech-tag">React Native (Customer)</span>
+        <span class="tech-tag">React Native (Rider)</span>
+        <span class="tech-tag">React Native Web (Merchant)</span>
+        <span class="tech-tag">Expo EAS Build</span>
+        <span class="tech-tag">Zustand (state)</span>
+        <span class="tech-tag">React Query</span>
+        <span class="tech-tag">Mapbox Maps SDK</span>
+      </div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-layer-label">Web</div>
+      <div class="stack-layer-content">
+        <span class="tech-tag">Next.js 14</span>
+        <span class="tech-tag">TypeScript</span>
+        <span class="tech-tag">TailwindCSS</span>
+        <span class="tech-tag">Radix UI</span>
+        <span class="tech-tag">Framer Motion</span>
+        <span class="tech-tag">React Query</span>
+        <span class="tech-tag">Recharts</span>
+      </div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-layer-label">Backend</div>
+      <div class="stack-layer-content">
+        <span class="tech-tag">Node.js / NestJS</span>
+        <span class="tech-tag">Go (logistics service)</span>
+        <span class="tech-tag">Python (ML/AI services)</span>
+        <span class="tech-tag">GraphQL (BFF)</span>
+        <span class="tech-tag">gRPC (internal)</span>
+        <span class="tech-tag">REST (merchant API)</span>
+        <span class="tech-tag">WebSockets (Socket.io)</span>
+      </div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-layer-label">Databases</div>
+      <div class="stack-layer-content">
+        <span class="tech-tag">PostgreSQL (primary)</span>
+        <span class="tech-tag">Redis (cache + sessions)</span>
+        <span class="tech-tag">MongoDB (catalog)</span>
+        <span class="tech-tag">Elasticsearch (search)</span>
+        <span class="tech-tag">Pinecone (vector DB)</span>
+        <span class="tech-tag">ClickHouse (analytics)</span>
+        <span class="tech-tag">TimescaleDB (GPS)</span>
+      </div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-layer-label">Messaging</div>
+      <div class="stack-layer-content">
+        <span class="tech-tag">Apache Kafka</span>
+        <span class="tech-tag">Redis Pub/Sub</span>
+        <span class="tech-tag">Bull Queue (BG jobs)</span>
+        <span class="tech-tag">Firebase FCM</span>
+        <span class="tech-tag">Twilio SMS</span>
+        <span class="tech-tag">WhatsApp Business API</span>
+      </div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-layer-label">Infrastructure</div>
+      <div class="stack-layer-content">
+        <span class="tech-tag">AWS (primary)</span>
+        <span class="tech-tag">EKS (Kubernetes)</span>
+        <span class="tech-tag">Terraform (IaC)</span>
+        <span class="tech-tag">CloudFront CDN</span>
+        <span class="tech-tag">Route 53</span>
+        <span class="tech-tag">AWS RDS Multi-AZ</span>
+        <span class="tech-tag">ElastiCache</span>
+      </div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-layer-label">Observability</div>
+      <div class="stack-layer-content">
+        <span class="tech-tag">Datadog APM</span>
+        <span class="tech-tag">PagerDuty (alerts)</span>
+        <span class="tech-tag">Sentry (errors)</span>
+        <span class="tech-tag">Grafana</span>
+        <span class="tech-tag">Prometheus</span>
+        <span class="tech-tag">OpenTelemetry</span>
+      </div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-layer-label">AI / ML</div>
+      <div class="stack-layer-content">
+        <span class="tech-tag">Python / FastAPI (ML serving)</span>
+        <span class="tech-tag">MLflow</span>
+        <span class="tech-tag">PyTorch (LSTM forecasting)</span>
+        <span class="tech-tag">scikit-learn (fraud)</span>
+        <span class="tech-tag">OSRM (routing)</span>
+        <span class="tech-tag">OpenAI API (LLM features)</span>
+        <span class="tech-tag">Sarvam AI (Hindi voice)</span>
+      </div>
+    </div>
+    <div class="stack-layer">
+      <div class="stack-layer-label">Payments</div>
+      <div class="stack-layer-content">
+        <span class="tech-tag">Razorpay (primary)</span>
+        <span class="tech-tag">PhonePe Business</span>
+        <span class="tech-tag">UPI Direct</span>
+        <span class="tech-tag">Cashfree (payouts)</span>
+        <span class="tech-tag">Stripe (enterprise)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-title">Engineering Hiring Roadmap</div>
+      <table class="data-table">
+        <thead><tr><th>Role</th><th>When</th><th>Why</th><th>CTC</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Founding Engineer (Full Stack)</strong></td><td><span class="accent-text">Now</span></td><td>Build customer + merchant app</td><td class="muted-text">₹30-40L</td></tr>
+          <tr><td><strong>Backend Engineer (Node/Go)</strong></td><td><span class="accent-text">Now</span></td><td>Order management core APIs</td><td class="muted-text">₹25-35L</td></tr>
+          <tr><td><strong>Mobile Engineer (RN)</strong></td><td>Series A</td><td>Native performance rider app</td><td class="muted-text">₹20-30L</td></tr>
+          <tr><td><strong>ML Engineer</strong></td><td>Series A</td><td>Demand forecasting + fraud</td><td class="muted-text">₹35-50L</td></tr>
+          <tr><td><strong>DevOps / SRE</strong></td><td>Series A</td><td>99.9% uptime at scale</td><td class="muted-text">₹25-40L</td></tr>
+          <tr><td><strong>Data Engineer</strong></td><td>Series A</td><td>Kafka + warehouse pipelines</td><td class="muted-text">₹20-30L</td></tr>
+          <tr><td><strong>VP Engineering</strong></td><td>Series B</td><td>Scale team 5→25 engineers</td><td class="muted-text">₹60-100L</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Microservices Architecture Map</div>
+      <div class="arch-grid" style="grid-template-columns: 1fr 1fr;">
+        <div class="arch-box">
+          <div class="arch-box-title">Order Service</div>
+          <ul class="arch-box-items">
+            <li>createOrder, updateStatus</li>
+            <li>State machine (9 states)</li>
+            <li>Timeout handling</li>
+            <li>Refund initiation</li>
+          </ul>
+        </div>
+        <div class="arch-box">
+          <div class="arch-box-title">Logistics Service</div>
+          <ul class="arch-box-items">
+            <li>Rider assignment (Go)</li>
+            <li>GPS stream processing</li>
+            <li>ETA prediction</li>
+            <li>Route optimization</li>
+          </ul>
+        </div>
+        <div class="arch-box">
+          <div class="arch-box-title">Catalog Service</div>
+          <ul class="arch-box-items">
+            <li>Merchant menu CRUD</li>
+            <li>Inventory sync</li>
+            <li>Search indexing</li>
+            <li>Pricing rules engine</li>
+          </ul>
+        </div>
+        <div class="arch-box">
+          <div class="arch-box-title">User Service</div>
+          <ul class="arch-box-items">
+            <li>Auth (JWT + refresh)</li>
+            <li>Profile management</li>
+            <li>Address book</li>
+            <li>Preferences + wallet</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================ INVESTORS ================================ -->
+<div class="section" id="investors">
+  <div class="war-room-hero">
+    <div class="hero-label">Investor War Room · Fundraising OS</div>
+    <div class="hero-title">RAISE<br><span>SMART</span></div>
+  </div>
+
+  <div class="grid-65">
+    <div class="panel">
+      <div class="panel-title">Funding Roadmap — Pre-Seed to IPO</div>
+      <table class="data-table">
+        <thead><tr>
+          <th>Stage</th><th>Target Raise</th><th>Valuation</th><th>Key Milestone Needed</th><th>Investor Type</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Pre-Seed</strong></td>
+            <td class="accent-text">₹1–2Cr</td>
+            <td class="muted-text">₹8–12Cr</td>
+            <td>MVP live · 100 orders/day · 20 merchants</td>
+            <td><span class="tag">Angel</span><span class="tag">Accelerator</span></td>
+          </tr>
+          <tr>
+            <td><strong>Seed</strong></td>
+            <td class="accent-text">₹5–8Cr</td>
+            <td class="muted-text">₹35–50Cr</td>
+            <td>500 orders/day · 100 merchants · 1 city profitable unit econ</td>
+            <td><span class="tag">Micro VC</span><span class="tag">Seed Fund</span></td>
+          </tr>
+          <tr>
+            <td><strong>Series A</strong></td>
+            <td class="accent-text">₹25–40Cr</td>
+            <td class="muted-text">₹200–300Cr</td>
+            <td>3 cities · ₹10Cr GMV/month · Contribution margin positive</td>
+            <td><span class="tag">Peak XV</span><span class="tag">Accel</span><span class="tag">Elevation</span></td>
+          </tr>
+          <tr>
+            <td><strong>Series B</strong></td>
+            <td class="accent-text">₹100–150Cr</td>
+            <td class="muted-text">₹800Cr–1,200Cr</td>
+            <td>10 cities · ₹100Cr GMV/month · Category leader</td>
+            <td><span class="tag">Lightspeed</span><span class="tag">General Atlantic</span></td>
+          </tr>
+          <tr>
+            <td><strong>Series C+</strong></td>
+            <td class="accent-text">₹500Cr+</td>
+            <td class="muted-text">₹5,000Cr+</td>
+            <td>30 cities · Profitability path · IPO readiness</td>
+            <td><span class="tag">Tiger Global</span><span class="tag">SoftBank</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 1.5rem;">
+        <div class="panel-title">5-Year Financial Projections (₹ Crore GMV)</div>
+        <div class="chart-wrap" style="height: 200px;">
+          <canvas id="projChart" role="img" aria-label="5 year GMV projection chart">5-year GMV projections showing growth from Year 1 to Year 5</canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVESTOR DATABASE -->
+    <div class="panel">
+      <div class="panel-title">Priority Indian VC Targets</div>
+      <div class="investor-card">
+        <div><div class="vc-name">Peak XV Partners</div><div class="vc-focus">Consumer · Marketplace · Logistics</div></div>
+        <div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3);">Sweet Spot</div><div class="check-size">$5–15M</div></div>
+        <div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3);">Match</div><div><div class="interest-bar"><div class="interest-fill" style="width:90%"></div></div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3); margin-top:2px;">90%</div></div></div>
+        <div><span class="status-pill live">Priority 1</span></div>
+      </div>
+      <div class="investor-card">
+        <div><div class="vc-name">Accel India</div><div class="vc-focus">Technology · Marketplace · Early Stage</div></div>
+        <div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3);">Sweet Spot</div><div class="check-size">$2–8M</div></div>
+        <div><div><div class="interest-bar"><div class="interest-fill" style="width:85%"></div></div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3); margin-top:2px;">85%</div></div></div>
+        <div><span class="status-pill live">Priority 1</span></div>
+      </div>
+      <div class="investor-card">
+        <div><div class="vc-name">Elevation Capital</div><div class="vc-focus">Consumer Internet · B2B SaaS</div></div>
+        <div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3);">Sweet Spot</div><div class="check-size">$3–10M</div></div>
+        <div><div><div class="interest-bar"><div class="interest-fill" style="width:80%"></div></div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3); margin-top:2px;">80%</div></div></div>
+        <div><span class="status-pill live">Priority 1</span></div>
+      </div>
+      <div class="investor-card">
+        <div><div class="vc-name">Kalaari Capital</div><div class="vc-focus">Consumer · Deep Tech</div></div>
+        <div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3);">Sweet Spot</div><div class="check-size">$2–5M</div></div>
+        <div><div><div class="interest-bar"><div class="interest-fill" style="width:70%"></div></div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3); margin-top:2px;">70%</div></div></div>
+        <div><span class="status-pill building">Priority 2</span></div>
+      </div>
+      <div class="investor-card">
+        <div><div class="vc-name">Lightspeed India</div><div class="vc-focus">SaaS · Marketplace · Fintech</div></div>
+        <div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3);">Sweet Spot</div><div class="check-size">$5–20M</div></div>
+        <div><div><div class="interest-bar"><div class="interest-fill" style="width:75%"></div></div><div style="font-size:0.6rem; color:rgba(255,255,255,0.3); margin-top:2px;">75%</div></div></div>
+        <div><span class="status-pill building">Priority 2</span></div>
+      </div>
+
+      <div style="margin-top: 1.5rem;">
+        <div class="panel-title">Cap Table — Pre-Seed Target</div>
+        <div class="cap-table-row header"><div>Stakeholder</div><div>Shares</div><div>%</div><div>Type</div></div>
+        <div class="cap-table-row"><div><strong>Founder 1 (CEO)</strong></div><div class="mono">4,500,000</div><div class="green-text">45%</div><div><div class="equity-bar"><div class="equity-fill" style="width:45%; background:#4caf93;"></div></div></div></div>
+        <div class="cap-table-row"><div><strong>Founder 2 (CTO)</strong></div><div class="mono">3,500,000</div><div class="green-text">35%</div><div><div class="equity-bar"><div class="equity-fill" style="width:35%; background:#4caf93;"></div></div></div></div>
+        <div class="cap-table-row"><div>ESOP Pool</div><div class="mono">1,000,000</div><div>10%</div><div><div class="equity-bar"><div class="equity-fill" style="width:10%; background:#5590e0;"></div></div></div></div>
+        <div class="cap-table-row"><div>Pre-Seed Angels</div><div class="mono">1,000,000</div><div class="accent-text">10%</div><div><div class="equity-bar"><div class="equity-fill" style="width:10%; background:var(--accent);"></div></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================ OPS PLAYBOOK ================================ -->
+<div class="section" id="ops">
+  <div class="war-room-hero">
+    <div class="hero-label">Operations Playbook · Standard Operating Procedures</div>
+    <div class="hero-title">HOW WE<br><span>EXECUTE</span></div>
+  </div>
+
+  <div class="grid-3">
+    <!-- MERCHANT ONBOARDING SOP -->
+    <div class="panel">
+      <div class="panel-title">SOP: Merchant Onboarding (D0–D7)</div>
+      <div class="sop-item">
+        <div class="sop-num">1</div>
+        <div class="sop-content">
+          <div class="sop-step-title">Initial Qualification (Day 0)</div>
+          <div class="sop-step-meta">Verify: daily foot traffic >50 customers, willing to fulfill in <10min, has smartphone, FSSAI license (food). Disqualify: pure dine-in, no packaging capability.</div>
+        </div>
+      </div>
+      <div class="sop-item">
+        <div class="sop-num">2</div>
+        <div class="sop-content">
+          <div class="sop-step-title">Document Collection (Day 1)</div>
+          <div class="sop-step-meta">FSSAI/GST/Shop license (photo upload) · Bank account details for payouts · WhatsApp number for escalations · Owner KYC (Aadhaar)</div>
+        </div>
+      </div>
+      <div class="sop-item">
+        <div class="sop-num">3</div>
+        <div class="sop-content">
+          <div class="sop-step-title">Catalog Setup (Day 2–3)</div>
+          <div class="sop-step-meta">City ops team photographs top 20 items · Uploads to merchant dashboard · Sets prices (≥ MRP compliance check) · Configures operating hours + holidays</div>
+        </div>
+      </div>
+      <div class="sop-item">
+        <div class="sop-num">4</div>
+        <div class="sop-content">
+          <div class="sop-step-title">Test Run (Day 4)</div>
+          <div class="sop-step-meta">Place 3 internal test orders · Verify accept flow · Check packaging quality · Test OTP handoff · Measure pickup time · Brief merchant on rejection reasons</div>
+        </div>
+      </div>
+      <div class="sop-item">
+        <div class="sop-num">5</div>
+        <div class="sop-content">
+          <div class="sop-step-title">Go-Live + First Week Support</div>
+          <div class="sop-step-meta">Merchant goes live · City ops calls merchant every day first week · 1-click escalation in Merchant app → ops team responds in <15min</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ESCALATION MATRIX -->
+    <div class="panel">
+      <div class="panel-title">Escalation Matrix — Delivery Issues</div>
+      <div class="escalation-matrix" style="grid-template-columns: 1fr;">
+        <div class="esc-cell l1">
+          <div class="esc-level">Level 1 — Auto Resolve</div>
+          <div class="esc-title">Minor Delays (5–10min over ETA)</div>
+          <div class="esc-meta">Action: Automated in-app message + ₹20 coupon issued · No human intervention · SLA: Real-time</div>
+        </div>
+        <div class="esc-cell l2" style="margin-top: 8px;">
+          <div class="esc-level">Level 2 — Ops Team</div>
+          <div class="esc-title">Major Delay / Wrong Item / Damaged</div>
+          <div class="esc-meta">Action: Ops executive calls customer within 5min · Options: Partial refund (30min) or full re-delivery · Merchant QC flag · SLA: 5min response</div>
+        </div>
+        <div class="esc-cell l3" style="margin-top: 8px;">
+          <div class="esc-level">Level 3 — Founder</div>
+          <div class="esc-title">Food Safety / PR Risk / Rider Incident</div>
+          <div class="esc-meta">Action: Founder personally calls customer · Merchant suspended pending audit · Full refund instant · Legal review if injury · SLA: 15min</div>
+        </div>
+      </div>
+
+      <div style="margin-top: 1.5rem;">
+        <div class="panel-title">Peak Hour Operations</div>
+        <div class="sop-item">
+          <div class="sop-num" style="background: rgba(240,165,0,0.15); color: #f0a500;">!</div>
+          <div class="sop-content">
+            <div class="sop-step-title">Pre-Peak (T-60min)</div>
+            <div class="sop-step-meta">Surge alert sent to all offline riders · Merchant pre-prep notification (AI demand forecast) · Extra delivery zone pre-positioned riders · On-call ops person briefed</div>
+          </div>
+        </div>
+        <div class="sop-item">
+          <div class="sop-num" style="background: rgba(232,56,13,0.15); color: #ff7755;">!</div>
+          <div class="sop-content">
+            <div class="sop-step-title">During Peak</div>
+            <div class="sop-step-meta">Live dashboard: ETA deviations, rider coverage gaps, merchant queue depth · Surge pricing auto-activates at 1.5x if demand/supply ratio >2.5 · Ops team on Slack war room</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CITY LAUNCH CHECKLIST -->
+    <div class="panel">
+      <div class="panel-title">City Launch Checklist (T-30 days)</div>
+      <table class="data-table">
+        <thead><tr><th>Task</th><th>Owner</th><th>Deadline</th></tr></thead>
+        <tbody>
+          <tr><td>Hire City Manager</td><td class="muted-text">HR</td><td>T-30</td></tr>
+          <tr><td>Zone mapping (5km² initial area)</td><td class="muted-text">City Mgr</td><td>T-25</td></tr>
+          <tr><td>Sign 30+ merchants (target 50)</td><td class="muted-text">City Mgr</td><td>T-20</td></tr>
+          <tr><td>Recruit 20 riders (target 30)</td><td class="muted-text">City Mgr</td><td>T-15</td></tr>
+          <tr><td>Catalog photography done</td><td class="muted-text">Ops</td><td>T-10</td></tr>
+          <tr><td>App configured for city (zones, pricing)</td><td class="muted-text">Eng</td><td>T-7</td></tr>
+          <tr><td>100 invite-only beta users</td><td class="muted-text">Growth</td><td>T-5</td></tr>
+          <tr><td>Crisis plan + ops team briefed</td><td class="muted-text">Founder</td><td>T-3</td></tr>
+          <tr><td>Press release + influencer posts</td><td class="muted-text">Marketing</td><td>T-0</td></tr>
+          <tr><td>30-day post-launch review meeting</td><td class="muted-text">Founder</td><td>T+30</td></tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top: 1.5rem; padding: 1rem; background: rgba(232,56,13,0.06); border-radius: 6px; border: 1px solid rgba(232,56,13,0.15);">
+        <div style="font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.5rem;">Founder Rule #1</div>
+        <div style="font-family: var(--font-serif); font-style: italic; font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.6;">Never launch a city until you can guarantee 20-minute delivery for the first 500 orders. One bad first experience spreads to 50 potential customers.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================ GROWTH ================================ -->
+<div class="section" id="growth">
+  <div class="war-room-hero">
+    <div class="hero-label">Growth Machine · Acquisition & Retention OS</div>
+    <div class="hero-title">HOW WE<br><span>GROW</span></div>
+  </div>
+
+  <div class="panel" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+    <div class="panel-title">Viral Growth Loops</div>
+    <div style="margin-bottom: 1.5rem;">
+      <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); margin-bottom: 0.8rem;">Loop 1 — Referral Engine</div>
+      <div class="growth-loop">
+        <div class="loop-step">User orders</div><div class="loop-arrow">→</div>
+        <div class="loop-step">Gets referral code</div><div class="loop-arrow">→</div>
+        <div class="loop-step">Shares on WhatsApp</div><div class="loop-arrow">→</div>
+        <div class="loop-step">Friend gets ₹50 off</div><div class="loop-arrow">→</div>
+        <div class="loop-step">Referrer gets ₹50</div><div class="loop-arrow">→</div>
+        <div class="loop-step">Friend orders → loop</div>
+      </div>
+    </div>
+    <div style="margin-bottom: 1.5rem;">
+      <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); margin-bottom: 0.8rem;">Loop 2 — Merchant Network Effect</div>
+      <div class="growth-loop">
+        <div class="loop-step">More merchants</div><div class="loop-arrow">→</div>
+        <div class="loop-step">More selection</div><div class="loop-arrow">→</div>
+        <div class="loop-step">More orders</div><div class="loop-arrow">→</div>
+        <div class="loop-step">More rider income</div><div class="loop-arrow">→</div>
+        <div class="loop-step">More riders</div><div class="loop-arrow">→</div>
+        <div class="loop-step">Faster delivery → more merchants</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.3); margin-bottom: 0.8rem;">Loop 3 — Data Flywheel</div>
+      <div class="growth-loop">
+        <div class="loop-step">Orders → data</div><div class="loop-arrow">→</div>
+        <div class="loop-step">Better AI recs</div><div class="loop-arrow">→</div>
+        <div class="loop-step">Higher conversion</div><div class="loop-arrow">→</div>
+        <div class="loop-step">More GMV</div><div class="loop-arrow">→</div>
+        <div class="loop-step">More merchants</div><div class="loop-arrow">→</div>
+        <div class="loop-step">More data → better AI</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="panel">
+      <div class="panel-title">Channel-wise CAC & ROI</div>
+      <table class="data-table">
+        <thead><tr><th>Channel</th><th>CAC</th><th>LTV:CAC</th><th>Priority</th></tr></thead>
+        <tbody>
+          <tr><td>Referral Program</td><td class="green-text">₹80</td><td class="green-text">8.5x</td><td><span class="status-pill live">Top</span></td></tr>
+          <tr><td>College Ambassadors</td><td class="green-text">₹95</td><td class="green-text">7.2x</td><td><span class="status-pill live">Top</span></td></tr>
+          <tr><td>WhatsApp Groups</td><td class="green-text">₹110</td><td class="green-text">6.8x</td><td><span class="status-pill live">Top</span></td></tr>
+          <tr><td>Meta Ads (Hyperlocal)</td><td>₹240</td><td>3.2x</td><td><span class="status-pill building">Test</span></td></tr>
+          <tr><td>Google UAC</td><td>₹280</td><td>2.8x</td><td><span class="status-pill building">Test</span></td></tr>
+          <tr><td>Influencer (micro)</td><td>₹190</td><td>4.1x</td><td><span class="status-pill building">Scale</span></td></tr>
+          <tr><td>OOH / Offline</td><td>₹400</td><td>1.8x</td><td><span class="status-pill planned">Later</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Retention System</div>
+      <div class="sop-item">
+        <div class="sop-num" style="background: rgba(85,144,224,0.15); color: #5590e0; font-family: var(--font-mono);">D1</div>
+        <div class="sop-content">
+          <div class="sop-step-title">Post-Delivery Rating Prompt</div>
+          <div class="sop-step-meta">Push: "How was your [Merchant Name] order?" → 1-tap rating → if 1–3★ trigger ops call + coupon · if 4–5★ trigger referral ask</div>
+        </div>
+      </div>
+      <div class="sop-item">
+        <div class="sop-num" style="background: rgba(85,144,224,0.15); color: #5590e0; font-family: var(--font-mono);">D3</div>
+        <div class="sop-content">
+          <div class="sop-step-title">Re-order Nudge</div>
+          <div class="sop-step-meta">"Your [last ordered item] is available again. One-tap reorder?" → 40%+ reorder rate on first nudge</div>
+        </div>
+      </div>
+      <div class="sop-item">
+        <div class="sop-num" style="background: rgba(85,144,224,0.15); color: #5590e0; font-family: var(--font-mono);">D7</div>
+        <div class="sop-content">
+          <div class="sop-step-title">Streak Reward</div>
+          <div class="sop-step-meta">"Order 3 times this week → get ₹30 cashback" gamification · Creates habit formation · Drives 7-day active users</div>
+        </div>
+      </div>
+      <div class="sop-item">
+        <div class="sop-num" style="background: rgba(232,56,13,0.15); color: #ff7755; font-family: var(--font-mono);">D14</div>
+        <div class="sop-content">
+          <div class="sop-step-title">Win-Back Campaign</div>
+          <div class="sop-step-meta">If no order in 14 days: "We miss you! Here's ₹40 off your next order" + new merchant featured notification</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Hyperlocal Domination Strategy</div>
+      <div style="margin-bottom: 1.2rem; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 6px; border: 1px solid rgba(255,255,255,0.06);">
+        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.5rem;">Zone Domination Model</div>
+        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.55); line-height: 1.7;">Start with 1 pin-code. Get to 50% penetration before expanding. Penetration = % of households who've ordered at least once. When 50% hit → expand to adjacent pin code. Never stretch before depth.</div>
+      </div>
+      <div class="metric-bar-row"><div class="metric-bar-label" style="font-size: 0.62rem;">Lajpat Nagar</div><div class="metric-bar-track"><div class="metric-bar-fill green" style="width: 48%"></div></div><div class="metric-bar-val">48%</div></div>
+      <div class="metric-bar-row"><div class="metric-bar-label" style="font-size: 0.62rem;">South Ex</div><div class="metric-bar-track"><div class="metric-bar-fill" style="width: 31%"></div></div><div class="metric-bar-val">31%</div></div>
+      <div class="metric-bar-row"><div class="metric-bar-label" style="font-size: 0.62rem;">GK-1</div><div class="metric-bar-track"><div class="metric-bar-fill amber" style="width: 22%"></div></div><div class="metric-bar-val">22%</div></div>
+      <div class="metric-bar-row"><div class="metric-bar-label" style="font-size: 0.62rem;">Hauz Khas</div><div class="metric-bar-track"><div class="metric-bar-fill" style="width: 14%"></div></div><div class="metric-bar-val">14%</div></div>
+      <div style="margin-top: 1rem; font-size: 0.65rem; color: rgba(255,255,255,0.3); padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
+        <span class="green-text">●</span> Lajpat Nagar approaching domination threshold — expand to Defence Colony next month
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================ AI ROADMAP ================================ -->
+<div class="section" id="ai">
+  <div class="war-room-hero">
+    <div class="hero-label">AI-First Quick Commerce · Intelligence Roadmap</div>
+    <div class="hero-title">THE AI<br><span>MOAT</span></div>
+  </div>
+
+  <div class="grid-3">
+    <div class="ai-card">
+      <div class="ai-card-title">Demand Forecasting Engine</div>
+      <div class="ai-card-desc">LSTM neural network trained on 90-day order history + weather API + local events (IPL, festivals, holidays) + time of day. Predicts order volume per merchant per hour with 87% accuracy.</div>
+      <div class="ai-impact">
+        <div class="ai-impact-item">Merchant waste<span>-34%</span></div>
+        <div class="ai-impact-item">OOS events<span>-61%</span></div>
+        <div class="ai-impact-item">Rider efficiency<span>+22%</span></div>
+      </div>
+    </div>
+    <div class="ai-card">
+      <div class="ai-card-title">Dynamic Pricing Engine</div>
+      <div class="ai-card-desc">Real-time surge pricing on delivery fee (not item prices) based on demand/supply ratio per zone. Surge 1x–2.5x. Merchant item promotions via AI discount engine based on inventory age + demand predictions.</div>
+      <div class="ai-impact">
+        <div class="ai-impact-item">Revenue/order<span>+18%</span></div>
+        <div class="ai-impact-item">Rider earnings<span>+24%</span></div>
+        <div class="ai-impact-item">GMV growth<span>+31%</span></div>
+      </div>
+    </div>
+    <div class="ai-card">
+      <div class="ai-card-title">Fraud Detection System</div>
+      <div class="ai-card-desc">Real-time ML classifier on every order: device fingerprint + order pattern + GPS behavior + payment velocity + social graph. Catches fake orders, OTP fraud, refund abuse, GPS spoofing by riders.</div>
+      <div class="ai-impact">
+        <div class="ai-impact-item">Fraud losses<span>-89%</span></div>
+        <div class="ai-impact-item">False positive<span>&lt;0.3%</span></div>
+        <div class="ai-impact-item">Detection time<span>&lt;2sec</span></div>
+      </div>
+    </div>
+    <div class="ai-card">
+      <div class="ai-card-title">Route Optimization</div>
+      <div class="ai-card-desc">OSRM-based routing with real-time traffic (Google Maps API). Multi-order batching algorithm: when 2 orders within 400m of each other, auto-batch if pickup <2min apart. Reduces cost per delivery 28%.</div>
+      <div class="ai-impact">
+        <div class="ai-impact-item">Delivery cost<span>-28%</span></div>
+        <div class="ai-impact-item">Orders/hour<span>+35%</span></div>
+        <div class="ai-impact-item">ETA accuracy<span>94%</span></div>
+      </div>
+    </div>
+    <div class="ai-card">
+      <div class="ai-card-title">AI Shopping Assistant (Phase 2)</div>
+      <div class="ai-card-desc">Conversational AI (GPT-4o + custom fine-tuning on Indian food/grocery context) in the customer app. "Plan my dinner for 4 people under ₹500" → generates full shopping cart from nearby merchants.</div>
+      <div class="ai-impact">
+        <div class="ai-impact-item">AOV increase<span>+42%</span></div>
+        <div class="ai-impact-item">Session time<span>+3.2x</span></div>
+        <div class="ai-impact-item">Conversion<span>+28%</span></div>
+      </div>
+    </div>
+    <div class="ai-card">
+      <div class="ai-card-title">Merchant Copilot (Phase 2)</div>
+      <div class="ai-card-desc">AI dashboard for merchants: "Your Paneer Butter Masala is running 40% below Monday demand — discount it 15% for 3 hours?" One-tap promotional actions driven by inventory × demand intelligence.</div>
+      <div class="ai-impact">
+        <div class="ai-impact-item">Merchant GMV<span>+29%</span></div>
+        <div class="ai-impact-item">Food waste<span>-45%</span></div>
+        <div class="ai-impact-item">Retention<span>+38%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top: 1px; border-top: 1px solid rgba(255,255,255,0.06);">
+    <div class="panel-title">Data Moat Strategy — Why We Become Unbeatable</div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+      <div>
+        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.6rem;">Year 1–2: Data Collection</div>
+        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5); line-height: 1.7;">Build the richest hyperlocal purchase dataset in India. Every transaction = location × time × category × customer profile × merchant performance × weather × event context.</div>
+      </div>
+      <div>
+        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.6rem;">Year 3–4: Intelligence Layer</div>
+        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5); line-height: 1.7;">Models trained on millions of hyperlocal transactions become impossible to replicate. Demand prediction accuracy compounds. Routing efficiency improves. Fraud models get sharper. This is the moat.</div>
+      </div>
+      <div>
+        <div style="font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.6rem;">Year 5+: Platform Play</div>
+        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.5); line-height: 1.7;">License merchant intelligence to banks (credit scoring). Sell demand data to FMCG brands. Power dark stores for national retailers. The data network becomes infrastructure — like AWS but for hyperlocal commerce.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================================ TIMELINE ================================ -->
+<div class="section" id="timeline">
+  <div class="war-room-hero">
+    <div class="hero-label">Execution Timeline · Day 1 to Decade 1</div>
+    <div class="hero-title">THE<br><span>ROADMAP</span></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="panel">
+      <div class="panel-title">First 90 Days — Week by Week</div>
+
+      <div class="roadmap-row">
+        <div class="roadmap-period">WK 1–2</div>
+        <div class="roadmap-milestones">
+          <span class="milestone-tag key">MVP app live (internal)</span>
+          <span class="milestone-tag">20 merchants signed</span>
+          <span class="milestone-tag">10 riders onboarded</span>
+          <span class="milestone-tag">Founding team finalized</span>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-period">WK 3–4</div>
+        <div class="roadmap-milestones">
+          <span class="milestone-tag key">First 100 orders</span>
+          <span class="milestone-tag">Referral system live</span>
+          <span class="milestone-tag">Payment integration</span>
+          <span class="milestone-tag">First refund processed</span>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-period">WK 5–8</div>
+        <div class="roadmap-milestones">
+          <span class="milestone-tag key">300 orders/day</span>
+          <span class="milestone-tag">50 merchants live</span>
+          <span class="milestone-tag">Live tracking shipped</span>
+          <span class="milestone-tag">Pre-seed deck ready</span>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-period">WK 9–12</div>
+        <div class="roadmap-milestones">
+          <span class="milestone-tag key">500 orders/day</span>
+          <span class="milestone-tag key">Pre-seed closed</span>
+          <span class="milestone-tag">Merchant dashboard v2</span>
+          <span class="milestone-tag">Second zone live</span>
+        </div>
+      </div>
+
+      <div style="height: 1px; background: rgba(255,255,255,0.06); margin: 1.5rem 0;"></div>
+      <div class="panel-title">Month-by-Month: Year 1</div>
+
+      <div class="roadmap-row"><div class="roadmap-period">M4–M6</div><div class="roadmap-milestones"><span class="milestone-tag key">Seed round</span><span class="milestone-tag">2nd city soft launch</span><span class="milestone-tag">Rider tier system</span><span class="milestone-tag">VELOCE Pass launch</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-period">M7–M9</div><div class="roadmap-milestones"><span class="milestone-tag key">2,000 orders/day</span><span class="milestone-tag">ML fraud model live</span><span class="milestone-tag">Demand forecasting</span><span class="milestone-tag">3rd city</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-period">M10–M12</div><div class="roadmap-milestones"><span class="milestone-tag key">Series A prep</span><span class="milestone-tag">₹5Cr GMV/month</span><span class="milestone-tag">Team 30+ people</span><span class="milestone-tag">Unit econ positive</span></div></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">3-Year Quarterly Roadmap</div>
+      <div class="roadmap-row"><div class="roadmap-period">Q1 Y1</div><div class="roadmap-milestones"><span class="milestone-tag key">Launch · 100 orders/day</span><span class="milestone-tag">1 city · 1 zone</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-period">Q2 Y1</div><div class="roadmap-milestones"><span class="milestone-tag key">Pre-seed ₹1.5Cr</span><span class="milestone-tag">500 orders/day</span><span class="milestone-tag">3 zones</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-period">Q3 Y1</div><div class="roadmap-milestones"><span class="milestone-tag">2 cities</span><span class="milestone-tag">1,500 orders/day</span><span class="milestone-tag">Seed raise</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-period">Q4 Y1</div><div class="roadmap-milestones"><span class="milestone-tag key">₹5Cr GMV/mo</span><span class="milestone-tag">3 cities</span><span class="milestone-tag">Series A process</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-period">Q1 Y2</div><div class="roadmap-milestones"><span class="milestone-tag key">Series A ₹30Cr</span><span class="milestone-tag">5 cities</span><span class="milestone-tag">AI features live</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-period">Q2 Y2</div><div class="roadmap-milestones"><span class="milestone-tag">10,000 orders/day</span><span class="milestone-tag">8 cities</span><span class="milestone-tag">Category leader</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-period">Q3 Y2</div><div class="roadmap-milestones"><span class="milestone-tag key">₹50Cr GMV/mo</span><span class="milestone-tag">Merchant OS v2</span><span class="milestone-tag">12 cities</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-period">Q4 Y2</div><div class="roadmap-milestones"><span class="milestone-tag key">Series B ₹120Cr</span><span class="milestone-tag">15 cities</span><span class="milestone-tag">Profitability path</span></div></div>
+      <div class="roadmap-row"><div class="roadmap-period">Q1–Q4 Y3</div><div class="roadmap-milestones"><span class="milestone-tag key">30 cities</span><span class="milestone-tag key">₹500Cr GMV/mo</span><span class="milestone-tag">Infrastructure pivot</span><span class="milestone-tag">IPO prep begins</span></div></div>
+
+      <div style="margin-top: 1.5rem; padding: 1.2rem; background: rgba(232,56,13,0.06); border-radius: 8px; border: 1px solid rgba(232,56,13,0.12);">
+        <div style="font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 0.6rem;">The Decade Vision</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <div style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--white);">₹50,000Cr</div>
+            <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35);">Annual GMV Target by 2034</div>
+          </div>
+          <div>
+            <div style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: #4caf93;">100+</div>
+            <div style="font-size: 0.65rem; color: rgba(255,255,255,0.35);">Indian cities dominated</div>
+          </div>
+        </div>
+        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-top: 0.8rem; line-height: 1.6;">From marketplace → logistics layer → merchant OS → data network → infrastructure company. Every category of Indian commerce runs on VELOCE rails.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// GMV Chart
+const gmvCtx = document.getElementById('gmvChart').getContext('2d');
+new Chart(gmvCtx, {
+  type: 'line',
+  data: {
+    labels: ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12'],
+    datasets: [{
+      label: 'GMV (₹L)',
+      data: [0.8, 1.2, 1.8, 2.8, 3.5, 4.9, 6.2, 8.1, 10.4, 13.8, 18.2, 24.1],
+      borderColor: '#e8380d',
+      backgroundColor: 'rgba(232,56,13,0.08)',
+      fill: true,
+      tension: 0.4,
+      pointRadius: 3,
+      pointBackgroundColor: '#e8380d',
+      borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 10 } }
+      },
+      y: {
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 10 }, callback: v => '₹' + v + 'L' }
+      }
+    }
+  }
+});
+
+// 5-year projection chart
+const projCtx = document.getElementById('projChart').getContext('2d');
+new Chart(projCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Y1', 'Y2', 'Y3', 'Y4', 'Y5'],
+    datasets: [{
+      label: 'GMV (₹Cr)',
+      data: [12, 85, 480, 1800, 5500],
+      backgroundColor: ['rgba(232,56,13,0.6)','rgba(232,56,13,0.65)','rgba(232,56,13,0.7)','rgba(232,56,13,0.8)','rgba(232,56,13,0.9)'],
+      borderColor: 'rgba(232,56,13,1)',
+      borderWidth: 1,
+      borderRadius: 3
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 10 } } },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 10 }, callback: v => '₹' + v + 'Cr' } }
+    }
+  }
+});
+
+// Animate metric bars on load
+document.addEventListener('DOMContentLoaded', () => {
+  const bars = document.querySelectorAll('.metric-bar-fill');
+  bars.forEach(b => {
+    const w = b.style.width;
+    b.style.width = '0%';
+    setTimeout(() => { b.style.width = w; }, 300);
+  });
+});
+</script>
+</body>
+</html>
